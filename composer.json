@@ -1,0 +1,8 @@
+{
+  "name": "kucl/mini-project",
+  "description": "PHP E-Commerce app with AWS RDS and DynamoDB",
+  "require": {
+    "php": ">=8.1",
+    "aws/aws-sdk-php": "^3.0"
+  }
+}

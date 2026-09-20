@@ -1,0 +1,4 @@
+.env
+vendor/
+*.pem
+.DS_Store

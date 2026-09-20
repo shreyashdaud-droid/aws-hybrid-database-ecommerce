@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KuCL Mini Project | E-Commerce</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; margin: 0; padding: 25px; color: #333; }
+    .header { background: #235c3f; color: white; padding: 20px 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+    .header h1 { margin: 0 0 6px 0; font-size: 24px; }
+    .header p { margin: 0; font-size: 14px; opacity: 0.9; }
+    .card { background: white; padding: 22px; margin-top: 20px; border-radius: 6px; border: 1px solid #e1e4e8; }
+    .card h2 { margin-top: 0; font-size: 18px; color: #235c3f; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) auto auto; gap: 10px; margin-bottom: 20px; }
+    input { padding: 9px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
+    button { padding: 9px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .btn-save { background: #235c3f; color: white; }
+    .btn-clear { background: #6c757d; color: white; }
+    .btn-delete { background: #dc3545; color: white; padding: 4px 10px; font-size: 12px; border-radius: 3px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; font-size: 14px; }
+    th { background: #f8f9fa; color: #495057; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>KuCL Mini Project</h1>
+    <p>E-commerce demo — Products & Orders on AWS RDS (MySQL) | User details on DynamoDB (NoSQL)</p>
+  </div>
+
+  <!-- RDS Products Section -->
+  <div class="card">
+    <h2>Products (AWS RDS - MySQL)</h2>
+    <div class="form-grid">
+      <input id="pName" placeholder="Name">
+      <input id="pCat" placeholder="Category">
+      <input id="pPrice" type="number" placeholder="Price">
+      <input id="pStock" type="number" placeholder="Stock Qty">
+      <button class="btn-save" onclick="saveProduct()">Save Product</button>
+      <button class="btn-clear" onclick="clearProductInputs()">Clear</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock Qty</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="productsTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- DynamoDB Users Section -->
+  <div class="card">
+    <h2>User Details (DynamoDB - NoSQL)</h2>
+    <div class="form-grid">
+      <input id="uName" placeholder="Name">
+      <input id="uEmail" type="email" placeholder="Email">
+      <input id="uPhone" placeholder="Phone">
+      <input id="uCity" placeholder="City">
+      <button class="btn-save" onclick="saveUser()">Save User</button>
+      <button class="btn-clear" onclick="clearUserInputs()">Clear</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="usersTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function fetchProducts() {
+      const res = await fetch('api/products.php');
+      const data = await res.json();
+      document.getElementById('productsTableBody').innerHTML = data.map(p => `
+        <tr>
+          <td>${p.id}</td>
+          <td>${p.name}</td>
+          <td>${p.category}</td>
+          <td>₹${p.price}</td>
+          <td>${p.stock_qty}</td>
+          <td><button class="btn-delete" onclick="deleteProduct(${p.id})">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function fetchUsers() {
+      const res = await fetch('api/users.php');
+      const data = await res.json();
+      document.getElementById('usersTableBody').innerHTML = data.map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>${u.phone}</td>
+          <td>${u.city}</td>
+          <td><button class="btn-delete" onclick="deleteUser('${encodeURIComponent(u.name)}')">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function saveProduct() {
+      const body = {
+        name: document.getElementById('pName').value,
+        category: document.getElementById('pCat').value,
+        price: document.getElementById('pPrice').value,
+        stock_qty: document.getElementById('pStock').value
+      };
+      await fetch('api/products.php', { method: 'POST', body: JSON.stringify(body) });
+      clearProductInputs();
+      fetchProducts();
+    }
+
+    async function saveUser() {
+      const body = {
+        name: document.getElementById('uName').value,
+        email: document.getElementById('uEmail').value,
+        phone: document.getElementById('uPhone').value,
+        city: document.getElementById('uCity').value
+      };
+      await fetch('api/users.php', { method: 'POST', body: JSON.stringify(body) });
+      clearUserInputs();
+      fetchUsers();
+    }
+
+    async function deleteProduct(id) {
+      await fetch(`api/products.php?id=${id}`, { method: 'DELETE' });
+      fetchProducts();
+    }
+
+    async function deleteUser(name) {
+      await fetch(`api/users.php?name=${name}`, { method: 'DELETE' });
+      fetchUsers();
+    }
+
+    function clearProductInputs() {
+      document.getElementById('pName').value = '';
+      document.getElementById('pCat').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pStock').value = '';
+    }
+
+    function clearUserInputs() {
+      document.getElementById('uName').value = '';
+      document.getElementById('uEmail').value = '';
+      document.getElementById('uPhone').value = '';
+      document.getElementById('uCity').value = '';
+    }
+
+    fetchProducts();
+    fetchUsers();
+  </script>
+</body>
+</html>
