@@ -7,10 +7,10 @@ try {
     $result = $dynamoClient->createTable([
         'TableName' => $tableName,
         'AttributeDefinitions' => [
-            ['AttributeName' => 'name', 'AttributeType' => 'S']
+            ['AttributeName' => 'user_id', 'AttributeType' => 'S']
         ],
         'KeySchema' => [
-            ['AttributeName' => 'name', 'KeyType' => 'HASH']
+            ['AttributeName' => 'user_id', 'KeyType' => 'HASH']
         ],
         'BillingMode' => 'PAY_PER_REQUEST'
     ]);
