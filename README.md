@@ -1,4 +1,4 @@
-# KuCL Mini Project — AWS Cloud E-Commerce Deployment
+# KuCL Mini Project — AWS Cloud E-Commerce Dual database Deployment
 
 A full-stack application demonstrating hybrid database architecture hosted on Amazon Web Services (AWS).
 
